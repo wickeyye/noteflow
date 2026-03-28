@@ -1,4 +1,4 @@
-import { Note } from '../types'
+import type { Note } from '../types/index'
 
 const STORAGE_KEY = 'noteflow_notes'
 
