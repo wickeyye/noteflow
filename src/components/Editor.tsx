@@ -1,4 +1,7 @@
+import { useState } from 'react'
 import type { Note } from '../types/index'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 
 interface EditorProps {
   note: Note | null
@@ -8,6 +11,8 @@ interface EditorProps {
 }
 
 export function Editor({ note, notesCount, onTitleChange, onContentChange }: EditorProps) {
+  const [isPreview, setIsPreview] = useState(false)
+
   if (!note) {
     return (
       <main className="editor-area">
@@ -24,19 +29,44 @@ export function Editor({ note, notesCount, onTitleChange, onContentChange }: Edi
 
   return (
     <main className="editor-area">
-      <input
-        type="text"
-        className="note-title-input"
-        value={note.title}
-        onChange={(e) => onTitleChange(e.target.value)}
-        placeholder="笔记标题"
-      />
-      <textarea
-        className="note-editor"
-        value={note.content}
-        onChange={(e) => onContentChange(e.target.value)}
-        placeholder="开始写笔记..."
-      />
+      <div className="editor-header">
+        <input
+          type="text"
+          className="note-title-input"
+          value={note.title}
+          onChange={(e) => onTitleChange(e.target.value)}
+          placeholder="笔记标题"
+        />
+        <div className="editor-toolbar">
+          <button
+            className={`btn-mode ${!isPreview ? 'active' : ''}`}
+            onClick={() => setIsPreview(false)}
+          >
+            ✏️ 编辑
+          </button>
+          <button
+            className={`btn-mode ${isPreview ? 'active' : ''}`}
+            onClick={() => setIsPreview(true)}
+          >
+            👁️ 预览
+          </button>
+        </div>
+      </div>
+
+      {isPreview ? (
+        <div className="markdown-preview">
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+            {note.content}
+          </ReactMarkdown>
+        </div>
+      ) : (
+        <textarea
+          className="note-editor"
+          value={note.content}
+          onChange={(e) => onContentChange(e.target.value)}
+          placeholder="开始写笔记... 支持 Markdown 格式"
+        />
+      )}
     </main>
   )
 }
