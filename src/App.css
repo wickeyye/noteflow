@@ -32,6 +32,13 @@
   color: #fff;
 }
 
+.notes-count {
+  font-size: 13px;
+  color: #999;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
 .btn-new {
   width: 100%;
   padding: 10px;
@@ -210,6 +217,21 @@
   flex-direction: column;
   gap: 15px;
   margin-bottom: 20px;
+}
+
+.editor-info {
+  display: flex;
+  gap: 20px;
+  font-size: 13px;
+  color: #999;
+  padding: 8px 0;
+}
+
+.char-count,
+.note-date {
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .editor-toolbar {

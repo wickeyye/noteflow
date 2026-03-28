@@ -44,6 +44,7 @@ export function Sidebar({
     <aside className="sidebar">
       <div className="sidebar-header">
         <h1 className="app-title">📝 NoteFlow</h1>
+        <div className="notes-count">共 {notes.length} 条笔记</div>
         <button className="btn-new" onClick={onNoteCreate}>
           + 新建笔记
         </button>

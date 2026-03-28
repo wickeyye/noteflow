@@ -37,6 +37,10 @@ export function Editor({ note, notesCount, onTitleChange, onContentChange }: Edi
           onChange={(e) => onTitleChange(e.target.value)}
           placeholder="笔记标题"
         />
+        <div className="editor-info">
+          <span className="char-count">📊 {note.content.length} 字符</span>
+          <span className="note-date">📅 更新于 {note.updatedAt}</span>
+        </div>
         <div className="editor-toolbar">
           <button
             className={`btn-mode ${!isPreview ? 'active' : ''}`}
