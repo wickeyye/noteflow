@@ -3,7 +3,7 @@
 ## 项目信息
 
 - **项目名称**: NoteFlow
-- **版本**: v0.1.0 (开发中)
+- **版本**: v0.2.0 (开发中)
 - **技术栈**: React 19 + TypeScript + Vite
 - **开始日期**: 2026-03-28
 - **最后更新**: 2026-03-28
@@ -20,100 +20,108 @@
 - [x] 实时搜索功能
 - [x] 笔记选择交互
 - [x] UI 设计文档
+- [x] LocalStorage 数据持久化
+- [x] 笔记删除功能（含确认对话框）
+- [x] 错误处理和数据验证
+- [x] 组件化重构（Sidebar, Editor）
+- [x] 自定义 Hooks (useNotes)
+- [x] Markdown 支持（编辑/预览模式）
 
 ### 🚧 当前问题
-- 数据仅存储在内存中，刷新后丢失
-- 缺少笔记删除功能
-- 没有数据持久化
-- 缺少错误处理
 - 没有测试覆盖
+- 缺少代码高亮功能
+- 没有快捷键支持
 
 ---
 
 ## 开发阶段规划
 
-### 第一阶段：核心功能完善 (v0.1.0) 🎯 当前阶段
+### 第一阶段：核心功能完善 (v0.1.0) ✅ 已完成
 
 **目标**: 完善基础功能，实现数据持久化
 
 **优先级**: P0 (必须完成)
 
-**预计时间**: 3-5 天
+**完成时间**: 2026-03-28
 
 #### 任务清单
 
-1. **数据持久化 - LocalStorage** (P0)
-   - [ ] 实现 LocalStorage 存储逻辑
-   - [ ] 添加数据加载功能
-   - [ ] 添加数据保存功能
-   - [ ] 处理存储异常情况
+1. **数据持久化 - LocalStorage** (P0) ✅
+   - [x] 实现 LocalStorage 存储逻辑
+   - [x] 添加数据加载功能
+   - [x] 添加数据保存功能
+   - [x] 处理存储异常情况
    - **技术方案**: 使用 `localStorage.setItem/getItem`
-   - **文件**: `src/utils/storage.ts`, `src/App.tsx`
+   - **文件**: `src/utils/storage.ts`, `src/hooks/useNotes.ts`
 
-2. **笔记删除功能** (P0)
-   - [ ] 添加删除按钮 UI
-   - [ ] 实现删除逻辑
-   - [ ] 添加删除确认对话框
-   - [ ] 处理删除后的状态更新
+2. **笔记删除功能** (P0) ✅
+   - [x] 添加删除按钮 UI
+   - [x] 实现删除逻辑
+   - [x] 添加删除确认对话框
+   - [x] 处理删除后的状态更新
    - **技术方案**: 添加删除按钮到笔记卡片，使用 confirm 确认
-   - **文件**: `src/App.tsx`, `src/App.css`
+   - **文件**: `src/App.tsx`, `src/App.css`, `src/components/Sidebar.tsx`
 
-3. **错误处理和边界情况** (P1)
-   - [ ] 添加空笔记列表提示
-   - [ ] 添加搜索无结果提示
-   - [ ] 处理 LocalStorage 存储失败
-   - [ ] 添加数据验证
-   - **文件**: `src/App.tsx`, `src/utils/storage.ts`
+3. **错误处理和边界情况** (P1) ✅
+   - [x] 添加空笔记列表提示
+   - [x] 添加搜索无结果提示
+   - [x] 处理 LocalStorage 存储失败
+   - [x] 添加数据验证
+   - **文件**: `src/components/Sidebar.tsx`, `src/utils/storage.ts`
 
-4. **代码优化** (P2)
-   - [ ] 提取组件（Sidebar, NoteList, Editor）
-   - [ ] 提取自定义 Hooks (useNotes, useLocalStorage)
-   - [ ] 添加 TypeScript 类型定义
-   - **文件**: `src/components/`, `src/hooks/`
+4. **代码优化** (P2) ✅
+   - [x] 提取组件（Sidebar, Editor）
+   - [x] 提取自定义 Hooks (useNotes)
+   - [x] 添加 TypeScript 类型定义
+   - **文件**: `src/components/`, `src/hooks/`, `src/types/`
 
-**里程碑**: 完成基础功能，数据可持久化保存
+**里程碑**: ✅ 完成基础功能，数据可持久化保存
 
 ---
 
-### 第二阶段：用户体验优化 (v0.2.0)
+### 第二阶段：用户体验优化 (v0.2.0) 🎯 当前阶段
 
 **目标**: 提升用户体验，增加实用功能
 
 **优先级**: P1
 
-**预计时间**: 5-7 天
+**开始时间**: 2026-03-28
 
 #### 任务清单
 
-1. **Markdown 支持** (P0)
-   - [ ] 集成 Markdown 解析库 (react-markdown)
-   - [ ] 实现 Markdown 预览模式
-   - [ ] 添加编辑/预览切换
+1. **Markdown 支持** (P0) ✅
+   - [x] 集成 Markdown 解析库 (react-markdown)
+   - [x] 实现 Markdown 预览模式
+   - [x] 添加编辑/预览切换
    - [ ] 支持代码高亮 (react-syntax-highlighter)
    - **依赖**: `react-markdown`, `remark-gfm`
-   - **文件**: `src/components/Editor.tsx`
+   - **文件**: `src/components/Editor.tsx`, `src/App.css`
+   - **状态**: 基础功能已完成，代码高亮待添加
 
-2. **笔记排序功能** (P1)
+2. **笔记排序功能** (P1) 🚧
    - [ ] 添加排序选项 UI（按时间、标题）
    - [ ] 实现排序逻辑
    - [ ] 保存排序偏好
    - **文件**: `src/App.tsx`, `src/components/Sidebar.tsx`
+   - **状态**: 待开发
 
-3. **快捷键支持** (P1)
+3. **快捷键支持** (P1) 🚧
    - [ ] Ctrl/Cmd + N: 新建笔记
    - [ ] Ctrl/Cmd + S: 保存（提示已自动保存）
    - [ ] Ctrl/Cmd + F: 聚焦搜索框
    - [ ] Ctrl/Cmd + Delete: 删除当前笔记
    - **技术方案**: 使用 `useEffect` 监听键盘事件
    - **文件**: `src/hooks/useKeyboard.ts`
+   - **状态**: 待开发
 
-4. **笔记统计信息** (P2)
+4. **笔记统计信息** (P2) 🚧
    - [ ] 显示笔记总数
    - [ ] 显示字符数统计
    - [ ] 显示创建时间
    - **文件**: `src/components/Sidebar.tsx`, `src/components/Editor.tsx`
+   - **状态**: 待开发
 
-**里程碑**: 支持 Markdown，用户体验显著提升
+**里程碑**: 支持 Markdown，用户体验显著提升（进行中）
 
 ---
 
@@ -401,7 +409,16 @@ noteflow/
 - ✅ 创建开发计划文档
 - ✅ 规划五个开发阶段
 - ✅ 定义技术选型和项目结构
-- 📝 当前阶段：第一阶段 - 核心功能完善
+- ✅ **第一阶段完成**: 核心功能完善 (v0.1.0)
+  - 实现 LocalStorage 数据持久化
+  - 添加笔记删除功能（含确认对话框）
+  - 完善错误处理和数据验证
+  - 组件化重构（Sidebar, Editor, useNotes Hook）
+- ✅ **第二阶段开始**: 用户体验优化 (v0.2.0)
+  - 集成 Markdown 支持（react-markdown + remark-gfm）
+  - 实现编辑/预览模式切换
+  - 添加完整的 Markdown 样式
+- 📝 当前阶段：第二阶段 - 继续完善用户体验功能
 
 ---
 
