@@ -7,6 +7,7 @@ interface SidebarProps {
   selectedNote: Note | null
   searchQuery: string
   sortBy: SortOption
+  searchInputRef?: React.RefObject<HTMLInputElement>
   onSearchChange: (query: string) => void
   onSortChange: (sortBy: SortOption) => void
   onNoteSelect: (note: Note) => void
@@ -19,6 +20,7 @@ export function Sidebar({
   selectedNote,
   searchQuery,
   sortBy,
+  searchInputRef,
   onSearchChange,
   onSortChange,
   onNoteSelect,
@@ -50,6 +52,7 @@ export function Sidebar({
       {/* 搜索框 */}
       <div className="search-box">
         <input
+          ref={searchInputRef}
           type="text"
           placeholder="🔍 搜索笔记..."
           value={searchQuery}

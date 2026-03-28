@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import './App.css'
 import { useNotes } from './hooks/useNotes'
+import { useKeyboard } from './hooks/useKeyboard'
 import { Sidebar } from './components/Sidebar'
 import { Editor } from './components/Editor'
 
@@ -21,10 +22,28 @@ function App() {
     const saved = localStorage.getItem('noteflow_sort')
     return (saved as SortOption) || 'time'
   })
+  const searchInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     localStorage.setItem('noteflow_sort', sortBy)
   }, [sortBy])
+
+  // 快捷键支持
+  useKeyboard({
+    onNew: createNote,
+    onSave: () => {
+      alert('✅ 笔记已自动保存')
+    },
+    onSearch: () => {
+      searchInputRef.current?.focus()
+    },
+    onDelete: () => {
+      if (selectedNote) {
+        const event = new MouseEvent('click', { bubbles: true })
+        handleDeleteNote(selectedNote.id, event as any)
+      }
+    }
+  })
 
   const handleDeleteNote = (noteId: number, e: React.MouseEvent) => {
     e.stopPropagation()
@@ -56,6 +75,7 @@ function App() {
         selectedNote={selectedNote}
         searchQuery={searchQuery}
         sortBy={sortBy}
+        searchInputRef={searchInputRef}
         onSearchChange={setSearchQuery}
         onSortChange={setSortBy}
         onNoteSelect={setSelectedNote}
