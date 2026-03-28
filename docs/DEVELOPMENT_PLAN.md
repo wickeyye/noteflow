@@ -98,30 +98,30 @@
    - **文件**: `src/components/Editor.tsx`, `src/App.css`
    - **状态**: 基础功能已完成，代码高亮待添加
 
-2. **笔记排序功能** (P1) 🚧
-   - [ ] 添加排序选项 UI（按时间、标题）
-   - [ ] 实现排序逻辑
-   - [ ] 保存排序偏好
-   - **文件**: `src/App.tsx`, `src/components/Sidebar.tsx`
-   - **状态**: 待开发
+2. **笔记排序功能** (P1) ✅
+   - [x] 添加排序选项 UI（按时间、标题）
+   - [x] 实现排序逻辑
+   - [x] 保存排序偏好
+   - **文件**: `src/App.tsx`, `src/components/Sidebar.tsx`, `src/App.css`
+   - **状态**: 已完成
 
-3. **快捷键支持** (P1) 🚧
-   - [ ] Ctrl/Cmd + N: 新建笔记
-   - [ ] Ctrl/Cmd + S: 保存（提示已自动保存）
-   - [ ] Ctrl/Cmd + F: 聚焦搜索框
-   - [ ] Ctrl/Cmd + Delete: 删除当前笔记
+3. **快捷键支持** (P1) ✅
+   - [x] Ctrl/Cmd + N: 新建笔记
+   - [x] Ctrl/Cmd + S: 保存（提示已自动保存）
+   - [x] Ctrl/Cmd + F: 聚焦搜索框
+   - [x] Ctrl/Cmd + Delete: 删除当前笔记
    - **技术方案**: 使用 `useEffect` 监听键盘事件
-   - **文件**: `src/hooks/useKeyboard.ts`
-   - **状态**: 待开发
+   - **文件**: `src/hooks/useKeyboard.ts`, `src/App.tsx`
+   - **状态**: 已完成
 
-4. **笔记统计信息** (P2) 🚧
-   - [ ] 显示笔记总数
-   - [ ] 显示字符数统计
-   - [ ] 显示创建时间
-   - **文件**: `src/components/Sidebar.tsx`, `src/components/Editor.tsx`
-   - **状态**: 待开发
+4. **笔记统计信息** (P2) ✅
+   - [x] 显示笔记总数
+   - [x] 显示字符数统计
+   - [x] 显示更新时间
+   - **文件**: `src/components/Sidebar.tsx`, `src/components/Editor.tsx`, `src/App.css`
+   - **状态**: 已完成
 
-**里程碑**: 支持 Markdown，用户体验显著提升（进行中）
+**里程碑**: ✅ 支持 Markdown，用户体验显著提升
 
 ---
 
@@ -414,11 +414,14 @@ noteflow/
   - 添加笔记删除功能（含确认对话框）
   - 完善错误处理和数据验证
   - 组件化重构（Sidebar, Editor, useNotes Hook）
-- ✅ **第二阶段开始**: 用户体验优化 (v0.2.0)
+- ✅ **第二阶段完成**: 用户体验优化 (v0.2.0)
   - 集成 Markdown 支持（react-markdown + remark-gfm）
   - 实现编辑/预览模式切换
   - 添加完整的 Markdown 样式
-- 📝 当前阶段：第二阶段 - 继续完善用户体验功能
+  - 实现笔记排序功能（按时间/按标题）
+  - 添加快捷键支持（Ctrl/Cmd + N/S/F/Delete）
+  - 添加笔记统计信息（总数、字符数、更新时间）
+- 📝 当前阶段：第二阶段已完成，准备进入第三阶段
 
 ---
 
