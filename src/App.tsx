@@ -1,8 +1,10 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import './App.css'
 import { useNotes } from './hooks/useNotes'
 import { Sidebar } from './components/Sidebar'
 import { Editor } from './components/Editor'
+
+type SortOption = 'time' | 'title'
 
 function App() {
   const {
@@ -15,6 +17,14 @@ function App() {
   } = useNotes()
 
   const [searchQuery, setSearchQuery] = useState('')
+  const [sortBy, setSortBy] = useState<SortOption>(() => {
+    const saved = localStorage.getItem('noteflow_sort')
+    return (saved as SortOption) || 'time'
+  })
+
+  useEffect(() => {
+    localStorage.setItem('noteflow_sort', sortBy)
+  }, [sortBy])
 
   const handleDeleteNote = (noteId: number, e: React.MouseEvent) => {
     e.stopPropagation()
@@ -45,7 +55,9 @@ function App() {
         notes={notes}
         selectedNote={selectedNote}
         searchQuery={searchQuery}
+        sortBy={sortBy}
         onSearchChange={setSearchQuery}
+        onSortChange={setSortBy}
         onNoteSelect={setSelectedNote}
         onNoteCreate={createNote}
         onNoteDelete={handleDeleteNote}

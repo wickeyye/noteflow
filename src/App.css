@@ -73,6 +73,37 @@
   color: #666;
 }
 
+/* 排序选项 */
+.sort-options {
+  display: flex;
+  gap: 8px;
+  padding: 10px 20px;
+  border-bottom: 1px solid #333;
+}
+
+.sort-btn {
+  flex: 1;
+  padding: 8px 12px;
+  background-color: #2a2a2a;
+  color: #999;
+  border: 1px solid #444;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.sort-btn:hover {
+  background-color: #303030;
+  color: #e0e0e0;
+}
+
+.sort-btn.active {
+  background-color: #4a9eff;
+  color: white;
+  border-color: #4a9eff;
+}
+
 /* 笔记列表 */
 .notes-list {
   flex: 1;

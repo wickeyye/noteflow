@@ -1,10 +1,14 @@
 import type { Note } from '../types/index'
 
+type SortOption = 'time' | 'title'
+
 interface SidebarProps {
   notes: Note[]
   selectedNote: Note | null
   searchQuery: string
+  sortBy: SortOption
   onSearchChange: (query: string) => void
+  onSortChange: (sortBy: SortOption) => void
   onNoteSelect: (note: Note) => void
   onNoteCreate: () => void
   onNoteDelete: (noteId: number, e: React.MouseEvent) => void
@@ -14,15 +18,25 @@ export function Sidebar({
   notes,
   selectedNote,
   searchQuery,
+  sortBy,
   onSearchChange,
+  onSortChange,
   onNoteSelect,
   onNoteCreate,
   onNoteDelete
 }: SidebarProps) {
-  const filteredNotes = notes.filter(note =>
-    note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    note.content.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+  const filteredNotes = notes
+    .filter(note =>
+      note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      note.content.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    .sort((a, b) => {
+      if (sortBy === 'time') {
+        return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+      } else {
+        return a.title.localeCompare(b.title)
+      }
+    })
 
   return (
     <aside className="sidebar">
@@ -41,6 +55,22 @@ export function Sidebar({
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
         />
+      </div>
+
+      {/* 排序选项 */}
+      <div className="sort-options">
+        <button
+          className={`sort-btn ${sortBy === 'time' ? 'active' : ''}`}
+          onClick={() => onSortChange('time')}
+        >
+          🕒 按时间
+        </button>
+        <button
+          className={`sort-btn ${sortBy === 'title' ? 'active' : ''}`}
+          onClick={() => onSortChange('title')}
+        >
+          🔤 按标题
+        </button>
       </div>
 
       {/* 笔记列表 */}
