@@ -6,9 +6,11 @@ interface SidebarProps {
   notes: Note[]
   selectedNote: Note | null
   searchQuery: string
+  selectedTag: string | null
   sortBy: SortOption
   searchInputRef?: React.RefObject<HTMLInputElement>
   onSearchChange: (query: string) => void
+  onTagSelect: (tag: string | null) => void
   onSortChange: (sortBy: SortOption) => void
   onNoteSelect: (note: Note) => void
   onNoteCreate: () => void
@@ -19,19 +21,34 @@ export function Sidebar({
   notes,
   selectedNote,
   searchQuery,
+  selectedTag,
   sortBy,
   searchInputRef,
   onSearchChange,
+  onTagSelect,
   onSortChange,
   onNoteSelect,
   onNoteCreate,
   onNoteDelete
 }: SidebarProps) {
+  // 收集所有标签
+  const allTags = Array.from(
+    new Set(notes.flatMap(note => note.tags || []))
+  ).sort()
+
+  // 筛选笔记
   const filteredNotes = notes
-    .filter(note =>
-      note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      note.content.toLowerCase().includes(searchQuery.toLowerCase())
-    )
+    .filter(note => {
+      // 搜索筛选
+      const matchesSearch = note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        note.content.toLowerCase().includes(searchQuery.toLowerCase())
+
+      // 标签筛选
+      const noteTags = note.tags || []
+      const matchesTag = !selectedTag || noteTags.includes(selectedTag)
+
+      return matchesSearch && matchesTag
+    })
     .sort((a, b) => {
       if (sortBy === 'time') {
         return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
@@ -76,6 +93,30 @@ export function Sidebar({
           🔤 按标题
         </button>
       </div>
+
+      {/* 标签筛选 */}
+      {allTags.length > 0 && (
+        <div className="tags-filter">
+          <div className="tags-filter-header">🏷️ 标签筛选</div>
+          <div className="tags-filter-list">
+            <button
+              className={`filter-tag ${!selectedTag ? 'active' : ''}`}
+              onClick={() => onTagSelect(null)}
+            >
+              全部
+            </button>
+            {allTags.map(tag => (
+              <button
+                key={tag}
+                className={`filter-tag ${selectedTag === tag ? 'active' : ''}`}
+                onClick={() => onTagSelect(tag)}
+              >
+                {tag}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* 笔记列表 */}
       <div className="notes-list">

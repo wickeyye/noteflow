@@ -14,13 +14,15 @@ export function useNotes() {
         id: 1,
         title: '欢迎使用 NoteFlow',
         content: '这是你的第一条笔记。点击开始编辑...',
-        updatedAt: '2026-03-28'
+        updatedAt: '2026-03-28',
+        tags: []
       },
       {
         id: 2,
         title: '快速开始指南',
         content: '1. 点击左侧笔记查看内容\n2. 使用搜索框查找笔记\n3. 点击"新建笔记"创建笔记',
-        updatedAt: '2026-03-28'
+        updatedAt: '2026-03-28',
+        tags: []
       }
     ]
   }
@@ -41,7 +43,8 @@ export function useNotes() {
       id: Date.now(),
       title: '新建笔记',
       content: '',
-      updatedAt: new Date().toISOString().split('T')[0]
+      updatedAt: new Date().toISOString().split('T')[0],
+      tags: []
     }
     setNotes([newNote, ...notes])
     setSelectedNote(newNote)

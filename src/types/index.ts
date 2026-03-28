@@ -3,4 +3,5 @@ export type Note = {
   title: string
   content: string
   updatedAt: string
+  tags: string[]
 }

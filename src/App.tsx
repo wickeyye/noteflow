@@ -18,6 +18,7 @@ function App() {
   } = useNotes()
 
   const [searchQuery, setSearchQuery] = useState('')
+  const [selectedTag, setSelectedTag] = useState<string | null>(null)
   const [sortBy, setSortBy] = useState<SortOption>(() => {
     const saved = localStorage.getItem('noteflow_sort')
     return (saved as SortOption) || 'time'
@@ -68,15 +69,22 @@ function App() {
     updateNote(selectedNote.id, { content })
   }
 
+  const handleTagsChange = (tags: string[]) => {
+    if (!selectedNote) return
+    updateNote(selectedNote.id, { tags })
+  }
+
   return (
     <div className="app">
       <Sidebar
         notes={notes}
         selectedNote={selectedNote}
         searchQuery={searchQuery}
+        selectedTag={selectedTag}
         sortBy={sortBy}
         searchInputRef={searchInputRef}
         onSearchChange={setSearchQuery}
+        onTagSelect={setSelectedTag}
         onSortChange={setSortBy}
         onNoteSelect={setSelectedNote}
         onNoteCreate={createNote}
@@ -87,6 +95,7 @@ function App() {
         notesCount={notes.length}
         onTitleChange={handleTitleChange}
         onContentChange={handleContentChange}
+        onTagsChange={handleTagsChange}
       />
     </div>
   )
