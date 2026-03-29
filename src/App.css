@@ -772,25 +772,41 @@
   flex-direction: column;
 }
 
-.sections-row {
+/* 分类标题行 - 横向排列 */
+.sections-headers-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.section-header-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: var(--bg-tertiary);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  user-select: none;
+  border-right: 1px solid var(--border-color);
+}
+
+.section-header-item:last-child {
+  border-right: none;
+}
+
+.section-header-item:hover {
+  background: var(--bg-hover);
 }
 
 .collapsible-section {
-  border-bottom: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
 }
 
-.sections-row .collapsible-section {
-  border-right: 1px solid var(--border-color);
-  border-bottom: 1px solid var(--border-color);
-}
-
-.sections-row .collapsible-section:last-child {
-  border-right: none;
+.notes-list {
+  padding: 12px;
 }
 
 .section-header {
