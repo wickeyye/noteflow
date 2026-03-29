@@ -164,88 +164,84 @@
   padding: 12px;
 }
 
-.note-item {
-  padding: 16px 18px;
-  margin-bottom: 8px;
+/* 紧凑笔记列表项 */
+.compact-note-item {
+  padding: 10px 14px;
+  margin-bottom: 4px;
   background: var(--bg-tertiary);
-  border-radius: 12px;
+  border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border: 1px solid transparent;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  position: relative;
 }
 
-.note-item:hover {
+.compact-note-item:hover {
   background: var(--bg-hover);
   transform: translateX(4px);
   border-color: var(--border-color);
 }
 
-.note-item.active {
+.compact-note-item.active {
   background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%);
   border-color: var(--accent-primary);
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.2);
 }
 
-.note-item-content {
+.note-info {
   flex: 1;
   min-width: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
 }
 
-.note-title {
-  font-size: 16px;
+.compact-note-item .note-title {
+  font-size: 14px;
   font-weight: 600;
-  margin-bottom: 8px;
   color: var(--text-primary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  flex: 1;
   letter-spacing: -0.01em;
 }
 
-.note-preview {
-  font-size: 13px;
-  color: var(--text-secondary);
-  margin-bottom: 6px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-family: 'JetBrains Mono', monospace;
-  opacity: 0.8;
-}
-
-.note-date {
+.compact-note-item .note-date {
   font-size: 11px;
   color: var(--text-tertiary);
   font-family: 'JetBrains Mono', monospace;
   letter-spacing: 0.02em;
+  flex-shrink: 0;
 }
 
-/* 删除按钮 */
-.btn-delete {
+.note-actions {
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.compact-note-item:hover .note-actions {
+  opacity: 1;
+}
+
+.btn-favorite {
   background: transparent;
   border: none;
-  font-size: 18px;
+  font-size: 16px;
   cursor: pointer;
-  padding: 8px;
-  border-radius: 8px;
-  opacity: 0;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  flex-shrink: 0;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.3s ease;
   color: var(--text-tertiary);
 }
 
-.note-item:hover .btn-delete {
-  opacity: 0.6;
-}
-
-.btn-delete:hover {
-  opacity: 1 !important;
-  background: rgba(239, 68, 68, 0.15);
-  color: #ef4444;
+.btn-favorite:hover {
+  background: rgba(255, 193, 7, 0.15);
   transform: scale(1.1);
 }
 
