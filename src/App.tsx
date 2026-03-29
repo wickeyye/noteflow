@@ -26,9 +26,9 @@ function App() {
     const saved = localStorage.getItem('noteflow_sort')
     return (saved as SortOption) || 'time'
   })
-  const [collapsedSections, setCollapsedSections] = useState<CollapsedSections>(() => {
-    const saved = localStorage.getItem('noteflow_collapsed_sections')
-    return saved ? JSON.parse(saved) : { recent: false, favorite: false, all: false }
+  const [activeTab, setActiveTab] = useState<'favorite' | 'all'>(() => {
+    const saved = localStorage.getItem('noteflow_active_tab')
+    return (saved as 'favorite' | 'all') || 'all'
   })
   const searchInputRef = useRef<HTMLInputElement>(null)
 
@@ -37,8 +37,8 @@ function App() {
   }, [sortBy])
 
   useEffect(() => {
-    localStorage.setItem('noteflow_collapsed_sections', JSON.stringify(collapsedSections))
-  }, [collapsedSections])
+    localStorage.setItem('noteflow_active_tab', activeTab)
+  }, [activeTab])
 
   // 快捷键支持
   useKeyboard({
@@ -85,12 +85,6 @@ function App() {
     updateNote(selectedNote.id, { tags })
   }
 
-  const handleToggleSection = (section: keyof CollapsedSections) => {
-    setCollapsedSections(prev => ({
-      ...prev,
-      [section]: !prev[section]
-    }))
-  }
 
   const handleImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files
@@ -154,18 +148,16 @@ function App() {
         notes={notes}
         selectedNote={selectedNote}
         searchQuery={searchQuery}
-        selectedTag={selectedTag}
         sortBy={sortBy}
-        collapsedSections={collapsedSections}
+        activeTab={activeTab}
         searchInputRef={searchInputRef}
         onSearchChange={setSearchQuery}
-        onTagSelect={setSelectedTag}
         onSortChange={setSortBy}
         onNoteSelect={setSelectedNote}
         onNoteCreate={createNote}
         onNoteDelete={handleDeleteNote}
         onToggleFavorite={toggleFavorite}
-        onToggleSection={handleToggleSection}
+        onTabChange={setActiveTab}
       />
       <Editor
         note={selectedNote}
