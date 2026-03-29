@@ -75,17 +75,19 @@ export function Sidebar({
         <h1 className="app-title">📝 NoteFlow</h1>
         <div className="notes-count">共 {notes.length} 条笔记</div>
         <div className="header-actions">
-          <button className="btn-new" onClick={onNoteCreate}>
-            + 新建
-          </button>
-          <input
-            ref={searchInputRef}
-            type="text"
-            className="search-input"
-            placeholder="🔍 搜索..."
-            value={searchQuery}
-            onChange={(e) => onSearchChange(e.target.value)}
-          />
+          <div className="header-actions-row">
+            <button className="btn-new" onClick={onNoteCreate}>
+              + 新建
+            </button>
+            <input
+              ref={searchInputRef}
+              type="text"
+              className="search-input"
+              placeholder="🔍 搜索..."
+              value={searchQuery}
+              onChange={(e) => onSearchChange(e.target.value)}
+            />
+          </div>
           <button
             className="btn-export-all"
             onClick={() => exportAllNotesAsZip(notes)}
@@ -99,72 +101,74 @@ export function Sidebar({
 
       {/* 分类区域 */}
       <div className="sections-container">
-        {/* 收藏笔记 */}
-        <CollapsibleSection
-          title="收藏"
-          icon="⭐"
-          count={favoriteNotes.length}
-          isCollapsed={collapsedSections.favorite}
-          onToggle={() => onToggleSection('favorite')}
-        >
-          {favoriteNotes.length === 0 ? (
-            <div className="empty-section">还没有收藏笔记</div>
-          ) : (
-            favoriteNotes.map(note => (
-              <CompactNoteItem
-                key={note.id}
-                note={note}
-                isActive={selectedNote?.id === note.id}
-                onSelect={() => onNoteSelect(note)}
-                onToggleFavorite={() => onToggleFavorite(note.id)}
-                onDelete={(e) => onNoteDelete(note.id, e)}
-              />
-            ))
-          )}
-        </CollapsibleSection>
+        <div className="sections-row">
+          {/* 收藏笔记 */}
+          <CollapsibleSection
+            title="收藏"
+            icon="⭐"
+            count={favoriteNotes.length}
+            isCollapsed={collapsedSections.favorite}
+            onToggle={() => onToggleSection('favorite')}
+          >
+            {favoriteNotes.length === 0 ? (
+              <div className="empty-section">还没有收藏笔记</div>
+            ) : (
+              favoriteNotes.map(note => (
+                <CompactNoteItem
+                  key={note.id}
+                  note={note}
+                  isActive={selectedNote?.id === note.id}
+                  onSelect={() => onNoteSelect(note)}
+                  onToggleFavorite={() => onToggleFavorite(note.id)}
+                  onDelete={(e) => onNoteDelete(note.id, e)}
+                />
+              ))
+            )}
+          </CollapsibleSection>
 
-        {/* 全部笔记 */}
-        <CollapsibleSection
-          title="全部"
-          icon="📄"
-          count={allNotes.length}
-          isCollapsed={collapsedSections.all}
-          onToggle={() => onToggleSection('all')}
-        >
-          {/* 排序选项 */}
-          <div className="sort-options">
-            <button
-              className={`sort-btn ${sortBy === 'time' ? 'active' : ''}`}
-              onClick={() => onSortChange('time')}
-            >
-              按时间
-            </button>
-            <button
-              className={`sort-btn ${sortBy === 'title' ? 'active' : ''}`}
-              onClick={() => onSortChange('title')}
-            >
-              按标题
-            </button>
-          </div>
-
-          {/* 笔记列表 */}
-          {allNotes.length === 0 ? (
-            <div className="empty-section">
-              {searchQuery ? '没有找到匹配的笔记' : '还没有笔记'}
+          {/* 全部笔记 */}
+          <CollapsibleSection
+            title="全部"
+            icon="📄"
+            count={allNotes.length}
+            isCollapsed={collapsedSections.all}
+            onToggle={() => onToggleSection('all')}
+          >
+            {/* 排序选项 */}
+            <div className="sort-options">
+              <button
+                className={`sort-btn ${sortBy === 'time' ? 'active' : ''}`}
+                onClick={() => onSortChange('time')}
+              >
+                按时间
+              </button>
+              <button
+                className={`sort-btn ${sortBy === 'title' ? 'active' : ''}`}
+                onClick={() => onSortChange('title')}
+              >
+                按标题
+              </button>
             </div>
-          ) : (
-            allNotes.map(note => (
-              <CompactNoteItem
-                key={note.id}
-                note={note}
-                isActive={selectedNote?.id === note.id}
-                onSelect={() => onNoteSelect(note)}
-                onToggleFavorite={() => onToggleFavorite(note.id)}
-                onDelete={(e) => onNoteDelete(note.id, e)}
-              />
-            ))
-          )}
-        </CollapsibleSection>
+
+            {/* 笔记列表 */}
+            {allNotes.length === 0 ? (
+              <div className="empty-section">
+                {searchQuery ? '没有找到匹配的笔记' : '还没有笔记'}
+              </div>
+            ) : (
+              allNotes.map(note => (
+                <CompactNoteItem
+                  key={note.id}
+                  note={note}
+                  isActive={selectedNote?.id === note.id}
+                  onSelect={() => onNoteSelect(note)}
+                  onToggleFavorite={() => onToggleFavorite(note.id)}
+                  onDelete={(e) => onNoteDelete(note.id, e)}
+                />
+              ))
+            )}
+          </CollapsibleSection>
+        </div>
       </div>
     </aside>
   )
