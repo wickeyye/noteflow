@@ -4,6 +4,7 @@ import { useNotes } from './hooks/useNotes'
 import { useKeyboard } from './hooks/useKeyboard'
 import { Sidebar } from './components/Sidebar'
 import { Editor } from './components/Editor'
+import type { CollapsedSections } from './types/index'
 
 type SortOption = 'time' | 'title'
 
@@ -14,7 +15,8 @@ function App() {
     setSelectedNote,
     createNote,
     updateNote,
-    deleteNote
+    deleteNote,
+    toggleFavorite
   } = useNotes()
 
   const [searchQuery, setSearchQuery] = useState('')
@@ -23,11 +25,19 @@ function App() {
     const saved = localStorage.getItem('noteflow_sort')
     return (saved as SortOption) || 'time'
   })
+  const [collapsedSections, setCollapsedSections] = useState<CollapsedSections>(() => {
+    const saved = localStorage.getItem('noteflow_collapsed_sections')
+    return saved ? JSON.parse(saved) : { recent: false, favorite: false, all: false }
+  })
   const searchInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     localStorage.setItem('noteflow_sort', sortBy)
   }, [sortBy])
+
+  useEffect(() => {
+    localStorage.setItem('noteflow_collapsed_sections', JSON.stringify(collapsedSections))
+  }, [collapsedSections])
 
   // 快捷键支持
   useKeyboard({
@@ -74,6 +84,13 @@ function App() {
     updateNote(selectedNote.id, { tags })
   }
 
+  const handleToggleSection = (section: keyof CollapsedSections) => {
+    setCollapsedSections(prev => ({
+      ...prev,
+      [section]: !prev[section]
+    }))
+  }
+
   return (
     <div className="app">
       <Sidebar
@@ -82,6 +99,7 @@ function App() {
         searchQuery={searchQuery}
         selectedTag={selectedTag}
         sortBy={sortBy}
+        collapsedSections={collapsedSections}
         searchInputRef={searchInputRef}
         onSearchChange={setSearchQuery}
         onTagSelect={setSelectedTag}
@@ -89,6 +107,8 @@ function App() {
         onNoteSelect={setSelectedNote}
         onNoteCreate={createNote}
         onNoteDelete={handleDeleteNote}
+        onToggleFavorite={toggleFavorite}
+        onToggleSection={handleToggleSection}
       />
       <Editor
         note={selectedNote}
