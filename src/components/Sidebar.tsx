@@ -90,20 +90,19 @@ export function Sidebar({
       <div className="sidebar-header">
         <h1 className="app-title">📝 NoteFlow</h1>
         <div className="notes-count">共 {notes.length} 条笔记</div>
-        <button className="btn-new" onClick={onNoteCreate}>
-          + 新建笔记
-        </button>
-      </div>
-
-      {/* 搜索框 */}
-      <div className="search-box">
-        <input
-          ref={searchInputRef}
-          type="text"
-          placeholder="🔍 搜索笔记..."
-          value={searchQuery}
-          onChange={(e) => onSearchChange(e.target.value)}
-        />
+        <div className="header-actions">
+          <button className="btn-new" onClick={onNoteCreate}>
+            + 新建
+          </button>
+          <input
+            ref={searchInputRef}
+            type="text"
+            className="search-input"
+            placeholder="🔍 搜索..."
+            value={searchQuery}
+            onChange={(e) => onSearchChange(e.target.value)}
+          />
+        </div>
       </div>
 
       {/* 分类区域 */}
