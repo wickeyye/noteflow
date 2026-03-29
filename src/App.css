@@ -730,3 +730,85 @@
   box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
   transform: translateY(-1px);
 }
+
+/* 分类区域样式 */
+.sections-container {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.collapsible-section {
+  border-bottom: 1px solid var(--border-color);
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: var(--bg-tertiary);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  user-select: none;
+}
+
+.section-header:hover {
+  background: var(--bg-hover);
+}
+
+.section-arrow {
+  font-size: 12px;
+  color: var(--text-secondary);
+  transition: transform 0.3s ease;
+}
+
+.section-icon {
+  font-size: 16px;
+}
+
+.section-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  flex: 1;
+}
+
+.section-count {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.section-content {
+  overflow: hidden;
+  transition: max-height 0.3s ease, opacity 0.3s ease;
+}
+
+.section-content.expanded {
+  max-height: 10000px;
+  opacity: 1;
+}
+
+.section-content.collapsed {
+  max-height: 0;
+  opacity: 0;
+}
+
+.empty-section {
+  padding: 20px;
+  text-align: center;
+  color: var(--text-tertiary);
+  font-size: 13px;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* 调整排序和标签筛选在全部笔记分类内的样式 */
+.collapsible-section .sort-options {
+  padding: 12px 16px 8px;
+  border-bottom: none;
+}
+
+.collapsible-section .tags-filter {
+  padding: 8px 16px 12px;
+  border-bottom: none;
+}
