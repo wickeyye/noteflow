@@ -205,6 +205,14 @@ function App() {
     setLoading(false)
   }
 
+  const handleLogout = async () => {
+    if (confirm('确定要退出登录吗？')) {
+      await supabase.auth.signOut()
+      setUser(null)
+      setGuestMode(false)
+    }
+  }
+
   if (loading) {
     return (
       <div className="app">
@@ -234,6 +242,7 @@ function App() {
         onNoteDelete={handleDeleteNote}
         onToggleFavorite={toggleFavorite}
         onTabChange={setActiveTab}
+        onLogout={handleLogout}
       />
       <Editor
         note={selectedNote}

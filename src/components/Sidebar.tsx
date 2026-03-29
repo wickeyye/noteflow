@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import type { Note } from '../types/index'
 import { CompactNoteItem } from './CompactNoteItem'
 
@@ -18,6 +19,7 @@ interface SidebarProps {
   onNoteDelete: (noteId: number, e: React.MouseEvent) => void
   onToggleFavorite: (noteId: number) => void
   onTabChange: (tab: 'favorite' | 'all') => void
+  onLogout?: () => void
 }
 
 export function Sidebar({
@@ -34,8 +36,10 @@ export function Sidebar({
   onNoteCreate,
   onNoteDelete,
   onToggleFavorite,
-  onTabChange
+  onTabChange,
+  onLogout
 }: SidebarProps) {
+  const [showUserMenu, setShowUserMenu] = useState(false)
   // 筛选收藏笔记
   const getFavoriteNotes = () => {
     return notes
@@ -80,9 +84,29 @@ export function Sidebar({
         <div className="header-top">
           <h1 className="app-title">📝 NoteFlow</h1>
           {userEmail && (
-            <div className="user-info" title={userEmail}>
-              <span className="user-icon">👤</span>
-              <span className="user-email">{userEmail}</span>
+            <div className="user-menu-container">
+              <div
+                className="user-info"
+                title={userEmail}
+                onClick={() => setShowUserMenu(!showUserMenu)}
+              >
+                <span className="user-icon">👤</span>
+                <span className="user-email">{userEmail}</span>
+              </div>
+              {showUserMenu && (
+                <div className="user-menu-dropdown">
+                  <button
+                    className="user-menu-item logout-btn"
+                    onClick={() => {
+                      setShowUserMenu(false)
+                      onLogout?.()
+                    }}
+                  >
+                    <span>🚪</span>
+                    <span>退出登录</span>
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>
