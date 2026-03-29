@@ -118,18 +118,15 @@ export function Sidebar({
 
         {/* 排序选项 */}
         <div className="sort-options">
-          <button
-            className={`sort-btn ${sortBy === 'time' ? 'active' : ''}`}
-            onClick={() => onSortChange('time')}
+          <label className="sort-label">排序：</label>
+          <select
+            className="sort-select"
+            value={sortBy}
+            onChange={(e) => onSortChange(e.target.value as SortOption)}
           >
-            按时间
-          </button>
-          <button
-            className={`sort-btn ${sortBy === 'title' ? 'active' : ''}`}
-            onClick={() => onSortChange('title')}
-          >
-            按标题
-          </button>
+            <option value="time">按时间</option>
+            <option value="title">按标题</option>
+          </select>
         </div>
 
         {/* 笔记列表 */}
