@@ -10,6 +10,9 @@ interface EditorProps {
 }
 
 export function Editor({ note, notesCount, onTitleChange, onContentChange, onTagsChange }: EditorProps) {
+  const [fontSize, setFontSize] = useState(17)
+  const [textColor, setTextColor] = useState('#f5f5f5')
+
   if (!note) {
     return (
       <main className="editor-area">
@@ -27,6 +30,39 @@ export function Editor({ note, notesCount, onTitleChange, onContentChange, onTag
   return (
     <main className="editor-area">
       <div className="editor-header">
+        <div className="editor-top-bar">
+          <div className="editor-toolbar">
+            <div className="toolbar-group">
+              <label className="toolbar-label">字号</label>
+              <button
+                className="toolbar-btn"
+                onClick={() => setFontSize(Math.max(12, fontSize - 2))}
+                title="减小字号"
+              >
+                A-
+              </button>
+              <span className="font-size-display">{fontSize}</span>
+              <button
+                className="toolbar-btn"
+                onClick={() => setFontSize(Math.min(32, fontSize + 2))}
+                title="增大字号"
+              >
+                A+
+              </button>
+            </div>
+            <div className="toolbar-group">
+              <label className="toolbar-label">颜色</label>
+              <input
+                type="color"
+                className="color-picker"
+                value={textColor}
+                onChange={(e) => setTextColor(e.target.value)}
+                title="选择文字颜色"
+              />
+            </div>
+          </div>
+          <span className="note-date-compact">📅 {note.updatedAt}</span>
+        </div>
         <input
           type="text"
           className="note-title-input"
@@ -34,16 +70,14 @@ export function Editor({ note, notesCount, onTitleChange, onContentChange, onTag
           onChange={(e) => onTitleChange(e.target.value)}
           placeholder="笔记标题"
         />
-        <div className="editor-info">
-          <span className="note-date">📅 更新于 {note.updatedAt}</span>
-        </div>
       </div>
 
       <textarea
         className="note-editor"
         value={note.content}
         onChange={(e) => onContentChange(e.target.value)}
-        placeholder="开始写笔记... 支持 Markdown 格式"
+        placeholder="开始写笔记..."
+        style={{ fontSize: `${fontSize}px`, color: textColor }}
       />
     </main>
   )
