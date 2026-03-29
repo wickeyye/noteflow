@@ -137,10 +137,3 @@ export async function checkSync() {
     return { success: false, error: error.message }
   }
 }
-
-// 暴露到全局
-if (typeof window !== 'undefined') {
-  (window as any).monitorSync = monitorSync
-  (window as any).stopMonitor = stopMonitor
-  (window as any).checkSync = checkSync
-}

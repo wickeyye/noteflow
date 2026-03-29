@@ -55,7 +55,7 @@ export async function diagnoseSync() {
       console.log('3️⃣ 检查表结构...')
 
       // 尝试查询表结构
-      const { data: tableData, error: tableError } = await supabase
+      const { error: tableError } = await supabase
         .from('notes')
         .select('*')
         .limit(0)
@@ -223,9 +223,4 @@ CREATE POLICY "Users can delete own notes"
       error: error.message
     }
   }
-}
-
-// 暴露到全局
-if (typeof window !== 'undefined') {
-  (window as any).diagnoseSync = diagnoseSync
 }

@@ -115,8 +115,3 @@ export async function testSync() {
     return { success: false, error: error.message }
   }
 }
-
-// 将测试函数暴露到全局
-if (typeof window !== 'undefined') {
-  (window as any).testSync = testSync
-}

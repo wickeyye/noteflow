@@ -8,19 +8,7 @@ import { Auth } from './components/Auth'
 import { importMarkdownFile, importZipFile, validateFileType } from './utils/import'
 import { supabase } from './lib/supabase'
 import { syncNotes } from './lib/sync'
-import { testSync } from './utils/testSync'
-import { monitorSync, stopMonitor, checkSync } from './utils/syncMonitor'
-import { diagnoseSync } from './utils/diagnose'
 import type { User } from '@supabase/supabase-js'
-
-// 暴露测试和监控函数到全局，方便在控制台调用
-if (typeof window !== 'undefined') {
-  (window as any).testSync = testSync
-  (window as any).monitorSync = monitorSync
-  (window as any).stopMonitor = stopMonitor
-  (window as any).checkSync = checkSync
-  (window as any).diagnoseSync = diagnoseSync
-}
 
 type SortOption = 'time' | 'title'
 
