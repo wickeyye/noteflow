@@ -4,4 +4,11 @@ export type Note = {
   content: string
   updatedAt: string
   tags: string[]
+  isFavorite?: boolean
+}
+
+export type CollapsedSections = {
+  recent: boolean
+  favorite: boolean
+  all: boolean
 }
