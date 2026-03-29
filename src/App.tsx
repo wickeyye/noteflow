@@ -5,7 +5,6 @@ import { useKeyboard } from './hooks/useKeyboard'
 import { Sidebar } from './components/Sidebar'
 import { Editor } from './components/Editor'
 import { importMarkdownFile, importZipFile, validateFileType } from './utils/import'
-import type { CollapsedSections } from './types/index'
 
 type SortOption = 'time' | 'title'
 
@@ -21,7 +20,6 @@ function App() {
   } = useNotes()
 
   const [searchQuery, setSearchQuery] = useState('')
-  const [selectedTag, setSelectedTag] = useState<string | null>(null)
   const [sortBy, setSortBy] = useState<SortOption>(() => {
     const saved = localStorage.getItem('noteflow_sort')
     return (saved as SortOption) || 'time'
