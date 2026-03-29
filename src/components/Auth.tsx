@@ -24,7 +24,13 @@ export function Auth({ onAuthSuccess }: AuthProps) {
           email,
           password
         })
-        if (error) throw error
+        if (error) {
+          // 特殊处理邮箱未验证的错误
+          if (error.message.includes('Email not confirmed')) {
+            throw new Error('邮箱未验证！请检查你的邮箱（包括垃圾邮件箱），点击验证链接后再登录。')
+          }
+          throw error
+        }
       } else {
         // 注册
         const { error } = await supabase.auth.signUp({
@@ -32,7 +38,9 @@ export function Auth({ onAuthSuccess }: AuthProps) {
           password
         })
         if (error) throw error
-        alert('注册成功！请检查邮箱验证链接。')
+        alert('注册成功！\n\n请检查邮箱（包括垃圾邮件箱）中的验证链接。\n验证后即可登录。')
+        setIsLogin(true) // 切换到登录模式
+        return // 不调用 onAuthSuccess，等待用户验证邮箱
       }
       onAuthSuccess()
     } catch (err: any) {

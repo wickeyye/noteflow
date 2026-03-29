@@ -9,6 +9,7 @@ interface SidebarProps {
   searchQuery: string
   sortBy: SortOption
   activeTab: 'favorite' | 'all'
+  userEmail?: string | null
   searchInputRef?: React.RefObject<HTMLInputElement | null>
   onSearchChange: (query: string) => void
   onSortChange: (sortBy: SortOption) => void
@@ -25,6 +26,7 @@ export function Sidebar({
   searchQuery,
   sortBy,
   activeTab,
+  userEmail,
   searchInputRef,
   onSearchChange,
   onSortChange,
@@ -75,7 +77,15 @@ export function Sidebar({
   return (
     <aside className="sidebar">
       <div className="sidebar-header">
-        <h1 className="app-title">📝 NoteFlow</h1>
+        <div className="header-top">
+          <h1 className="app-title">📝 NoteFlow</h1>
+          {userEmail && (
+            <div className="user-info" title={userEmail}>
+              <span className="user-icon">👤</span>
+              <span className="user-email">{userEmail}</span>
+            </div>
+          )}
+        </div>
         <div className="notes-count">共 {notes.length} 条笔记</div>
         <div className="header-actions">
           <div className="header-actions-row">

@@ -46,15 +46,28 @@ function cloudToLocal(cloudNote: CloudNote): Note {
 export async function uploadNotes(notes: Note[], userId: string): Promise<void> {
   if (!userId || notes.length === 0) return
 
+  // 先删除用户的所有笔记，然后重新插入
+  // 这样可以避免 upsert 的唯一约束问题
+  const { error: deleteError } = await supabase
+    .from('notes')
+    .delete()
+    .eq('user_id', userId)
+
+  if (deleteError) {
+    console.error('清理旧笔记失败:', deleteError)
+    throw deleteError
+  }
+
+  // 插入所有笔记
   const cloudNotes = notes.map(note => localToCloud(note, userId))
 
-  const { error } = await supabase
+  const { error: insertError } = await supabase
     .from('notes')
-    .upsert(cloudNotes, { onConflict: 'user_id,title' })
+    .insert(cloudNotes)
 
-  if (error) {
-    console.error('上传笔记失败:', error)
-    throw error
+  if (insertError) {
+    console.error('上传笔记失败:', insertError)
+    throw insertError
   }
 }
 
