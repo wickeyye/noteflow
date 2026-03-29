@@ -44,7 +44,8 @@ export function useNotes() {
       title: '新建笔记',
       content: '',
       updatedAt: new Date().toISOString().split('T')[0],
-      tags: []
+      tags: [],
+      isFavorite: false
     }
     setNotes([newNote, ...notes])
     setSelectedNote(newNote)
@@ -74,12 +75,27 @@ export function useNotes() {
     }
   }
 
+  const toggleFavorite = (noteId: number) => {
+    const updatedNotes = notes.map(note =>
+      note.id === noteId
+        ? { ...note, isFavorite: !note.isFavorite }
+        : note
+    )
+    setNotes(updatedNotes)
+
+    // 如果切换的是当前选中的笔记，同步更新 selectedNote
+    if (selectedNote?.id === noteId) {
+      setSelectedNote({ ...selectedNote, isFavorite: !selectedNote.isFavorite })
+    }
+  }
+
   return {
     notes,
     selectedNote,
     setSelectedNote,
     createNote,
     updateNote,
-    deleteNote
+    deleteNote,
+    toggleFavorite
   }
 }
