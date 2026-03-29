@@ -1,4 +1,6 @@
-import type { Note } from '../types/index'
+import type { Note, CollapsedSections } from '../types/index'
+import { CollapsibleSection } from './CollapsibleSection'
+import { CompactNoteItem } from './CompactNoteItem'
 
 type SortOption = 'time' | 'title'
 
@@ -8,6 +10,7 @@ interface SidebarProps {
   searchQuery: string
   selectedTag: string | null
   sortBy: SortOption
+  collapsedSections: CollapsedSections
   searchInputRef?: React.RefObject<HTMLInputElement>
   onSearchChange: (query: string) => void
   onTagSelect: (tag: string | null) => void
@@ -15,6 +18,8 @@ interface SidebarProps {
   onNoteSelect: (note: Note) => void
   onNoteCreate: () => void
   onNoteDelete: (noteId: number, e: React.MouseEvent) => void
+  onToggleFavorite: (noteId: number) => void
+  onToggleSection: (section: keyof CollapsedSections) => void
 }
 
 export function Sidebar({
@@ -23,39 +28,62 @@ export function Sidebar({
   searchQuery,
   selectedTag,
   sortBy,
+  collapsedSections,
   searchInputRef,
   onSearchChange,
   onTagSelect,
   onSortChange,
   onNoteSelect,
   onNoteCreate,
-  onNoteDelete
+  onNoteDelete,
+  onToggleFavorite,
+  onToggleSection
 }: SidebarProps) {
-  // 收集所有标签
-  const allTags = Array.from(
-    new Set(notes.flatMap(note => note.tags || []))
-  ).sort()
+  // 筛选最近笔记（7天内）
+  const getRecentNotes = () => {
+    const sevenDaysAgo = new Date()
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
+    const sevenDaysAgoStr = sevenDaysAgo.toISOString().split('T')[0]
 
-  // 筛选笔记
-  const filteredNotes = notes
-    .filter(note => {
-      // 搜索筛选
-      const matchesSearch = note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    return notes
+      .filter(note => note.updatedAt >= sevenDaysAgoStr)
+      .filter(note =>
+        note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         note.content.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+      .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+  }
 
-      // 标签筛选
-      const noteTags = note.tags || []
-      const matchesTag = !selectedTag || noteTags.includes(selectedTag)
+  // 筛选收藏笔记
+  const getFavoriteNotes = () => {
+    return notes
+      .filter(note => note.isFavorite)
+      .filter(note =>
+        note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        note.content.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+      .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+  }
 
-      return matchesSearch && matchesTag
-    })
-    .sort((a, b) => {
-      if (sortBy === 'time') {
-        return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-      } else {
-        return a.title.localeCompare(b.title)
-      }
-    })
+  // 筛选全部笔记
+  const getAllNotes = () => {
+    return notes
+      .filter(note => {
+        const matchesSearch = note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          note.content.toLowerCase().includes(searchQuery.toLowerCase())
+        return matchesSearch
+      })
+      .sort((a, b) => {
+        if (sortBy === 'time') {
+          return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+        } else {
+          return a.title.localeCompare(b.title)
+        }
+      })
+  }
+
+  const favoriteNotes = getFavoriteNotes()
+  const allNotes = getAllNotes()
 
   return (
     <aside className="sidebar">
@@ -78,74 +106,74 @@ export function Sidebar({
         />
       </div>
 
-      {/* 排序选项 */}
-      <div className="sort-options">
-        <button
-          className={`sort-btn ${sortBy === 'time' ? 'active' : ''}`}
-          onClick={() => onSortChange('time')}
+      {/* 分类区域 */}
+      <div className="sections-container">
+        {/* 收藏笔记 */}
+        <CollapsibleSection
+          title="收藏"
+          icon="⭐"
+          count={favoriteNotes.length}
+          isCollapsed={collapsedSections.favorite}
+          onToggle={() => onToggleSection('favorite')}
         >
-          🕒 按时间
-        </button>
-        <button
-          className={`sort-btn ${sortBy === 'title' ? 'active' : ''}`}
-          onClick={() => onSortChange('title')}
-        >
-          🔤 按标题
-        </button>
-      </div>
+          {favoriteNotes.length === 0 ? (
+            <div className="empty-section">还没有收藏笔记</div>
+          ) : (
+            favoriteNotes.map(note => (
+              <CompactNoteItem
+                key={note.id}
+                note={note}
+                isActive={selectedNote?.id === note.id}
+                onSelect={() => onNoteSelect(note)}
+                onToggleFavorite={() => onToggleFavorite(note.id)}
+                onDelete={(e) => onNoteDelete(note.id, e)}
+              />
+            ))
+          )}
+        </CollapsibleSection>
 
-      {/* 标签筛选 */}
-      {allTags.length > 0 && (
-        <div className="tags-filter">
-          <div className="tags-filter-header">🏷️ 标签筛选</div>
-          <div className="tags-filter-list">
+        {/* 全部笔记 */}
+        <CollapsibleSection
+          title="全部"
+          icon="📄"
+          count={allNotes.length}
+          isCollapsed={collapsedSections.all}
+          onToggle={() => onToggleSection('all')}
+        >
+          {/* 排序选项 */}
+          <div className="sort-options">
             <button
-              className={`filter-tag ${!selectedTag ? 'active' : ''}`}
-              onClick={() => onTagSelect(null)}
+              className={`sort-btn ${sortBy === 'time' ? 'active' : ''}`}
+              onClick={() => onSortChange('time')}
             >
-              全部
+              按时间
             </button>
-            {allTags.map(tag => (
-              <button
-                key={tag}
-                className={`filter-tag ${selectedTag === tag ? 'active' : ''}`}
-                onClick={() => onTagSelect(tag)}
-              >
-                {tag}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* 笔记列表 */}
-      <div className="notes-list">
-        {filteredNotes.length === 0 ? (
-          <div className="empty-list">
-            <p>{searchQuery ? '没有找到匹配的笔记' : '还没有笔记，点击上方按钮创建'}</p>
-          </div>
-        ) : (
-          filteredNotes.map(note => (
-            <div
-              key={note.id}
-              className={`note-item ${selectedNote?.id === note.id ? 'active' : ''}`}
-              onClick={() => onNoteSelect(note)}
+            <button
+              className={`sort-btn ${sortBy === 'title' ? 'active' : ''}`}
+              onClick={() => onSortChange('title')}
             >
-              <div className="note-item-content">
-                <h3 className="note-title">{note.title}</h3>
-                <p className="note-preview">{note.content.substring(0, 50)}...</p>
-                <span className="note-date">{note.updatedAt}</span>
-              </div>
-              <button
-                className="btn-delete"
-                onClick={(e) => onNoteDelete(note.id, e)}
-                title="删除笔记"
-              >
-                🗑️
-              </button>
+              按标题
+            </button>
+          </div>
+
+          {/* 笔记列表 */}
+          {allNotes.length === 0 ? (
+            <div className="empty-section">
+              {searchQuery ? '没有找到匹配的笔记' : '还没有笔记'}
             </div>
-          ))
-        )}
+          ) : (
+            allNotes.map(note => (
+              <CompactNoteItem
+                key={note.id}
+                note={note}
+                isActive={selectedNote?.id === note.id}
+                onSelect={() => onNoteSelect(note)}
+                onToggleFavorite={() => onToggleFavorite(note.id)}
+                onDelete={(e) => onNoteDelete(note.id, e)}
+              />
+            ))
+          )}
+        </CollapsibleSection>
       </div>
     </aside>
   )

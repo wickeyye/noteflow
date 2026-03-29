@@ -44,15 +44,15 @@
 }
 
 .sidebar-header {
-  padding: 32px 24px 24px;
+  padding: 16px 20px 12px;
   border-bottom: 1px solid var(--border-color);
   background: linear-gradient(180deg, var(--bg-secondary) 0%, transparent 100%);
 }
 
 .app-title {
-  font-size: 28px;
+  font-size: 20px;
   font-weight: 700;
-  margin-bottom: 12px;
+  margin-bottom: 6px;
   background: var(--accent-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -61,9 +61,9 @@
 }
 
 .notes-count {
-  font-size: 13px;
+  font-size: 12px;
   color: var(--text-tertiary);
-  margin-bottom: 16px;
+  margin-bottom: 10px;
   text-align: left;
   font-family: 'JetBrains Mono', monospace;
   letter-spacing: 0.02em;
@@ -71,7 +71,7 @@
 
 .btn-new {
   width: 100%;
-  padding: 12px 20px;
+  padding: 8px 16px;
   background: var(--accent-gradient);
   color: white;
   border: none;
@@ -96,7 +96,7 @@
 
 /* 搜索框 */
 .search-box {
-  padding: 16px 24px;
+  padding: 12px 20px;
   border-bottom: 1px solid var(--border-color);
 }
 
