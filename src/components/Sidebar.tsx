@@ -1,6 +1,5 @@
 import type { Note } from '../types/index'
 import { CompactNoteItem } from './CompactNoteItem'
-import { exportAllNotesAsZip } from '../utils/export'
 
 type SortOption = 'time' | 'title'
 
@@ -92,14 +91,6 @@ export function Sidebar({
               onChange={(e) => onSearchChange(e.target.value)}
             />
           </div>
-          <button
-            className="btn-export-all"
-            onClick={() => exportAllNotesAsZip(notes)}
-            disabled={notes.length === 0}
-            title="导出所有笔记"
-          >
-            导出全部
-          </button>
         </div>
       </div>
 

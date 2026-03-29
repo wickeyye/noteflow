@@ -71,14 +71,15 @@
 
 .header-actions {
   display: flex;
-  flex-direction: column;
   gap: 8px;
+  align-items: center;
 }
 
 .header-actions-row {
   display: flex;
   gap: 8px;
   align-items: center;
+  width: 100%;
 }
 
 .btn-new {
@@ -913,34 +914,6 @@
   border-bottom: none;
 }
 
-/* 导出全部按钮 */
-.btn-export-all {
-  width: 100%;
-  padding: 8px 16px;
-  background: var(--bg-tertiary);
-  color: var(--text-secondary);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  font-family: 'Crimson Pro', serif;
-  white-space: nowrap;
-}
-
-.btn-export-all:hover:not(:disabled) {
-  background: var(--bg-hover);
-  color: var(--text-primary);
-  border-color: var(--accent-primary);
-  transform: translateY(-1px);
-}
-
-.btn-export-all:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
 /* 工具栏分隔线 */
 .toolbar-divider {
   width: 1px;
@@ -964,11 +937,16 @@
   white-space: nowrap;
 }
 
-.toolbar-btn:hover {
+.toolbar-btn:hover:not(:disabled) {
   background: var(--bg-hover);
   color: var(--text-primary);
   border-color: var(--accent-primary);
   transform: translateY(-1px);
+}
+
+.toolbar-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .toolbar-btn:active {

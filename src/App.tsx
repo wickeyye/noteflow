@@ -162,6 +162,7 @@ function App() {
       <Editor
         note={selectedNote}
         notesCount={notes.length}
+        allNotes={notes}
         onTitleChange={handleTitleChange}
         onContentChange={handleContentChange}
         onTagsChange={handleTagsChange}

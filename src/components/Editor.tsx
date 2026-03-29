@@ -1,17 +1,18 @@
 import { useState } from 'react'
 import type { Note } from '../types/index'
-import { exportNoteAsMarkdown } from '../utils/export'
+import { exportNoteAsMarkdown, exportAllNotesAsZip } from '../utils/export'
 
 interface EditorProps {
   note: Note | null
   notesCount: number
+  allNotes: Note[]
   onTitleChange: (title: string) => void
   onContentChange: (content: string) => void
   onTagsChange: (tags: string[]) => void
   onImport: (event: React.ChangeEvent<HTMLInputElement>) => void
 }
 
-export function Editor({ note, notesCount, onTitleChange, onContentChange, onImport }: EditorProps) {
+export function Editor({ note, notesCount, allNotes, onTitleChange, onContentChange, onImport }: EditorProps) {
   const [fontSize, setFontSize] = useState(17)
   const [textColor, setTextColor] = useState('#f5f5f5')
 
@@ -68,7 +69,15 @@ export function Editor({ note, notesCount, onTitleChange, onContentChange, onImp
               onClick={() => exportNoteAsMarkdown(note)}
               title="导出当前笔记"
             >
-              导出 ▼
+              导出当前
+            </button>
+            <button
+              className="toolbar-btn"
+              onClick={() => exportAllNotesAsZip(allNotes)}
+              disabled={allNotes.length === 0}
+              title="导出所有笔记"
+            >
+              导出全部
             </button>
             <label className="toolbar-btn" title="导入笔记">
               导入
