@@ -94,6 +94,7 @@ export function useNotes() {
     notes,
     selectedNote,
     setSelectedNote,
+    setNotes,
     createNote,
     updateNote,
     deleteNote,

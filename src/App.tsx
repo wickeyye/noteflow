@@ -4,7 +4,11 @@ import { useNotes } from './hooks/useNotes'
 import { useKeyboard } from './hooks/useKeyboard'
 import { Sidebar } from './components/Sidebar'
 import { Editor } from './components/Editor'
+import { Auth } from './components/Auth'
 import { importMarkdownFile, importZipFile, validateFileType } from './utils/import'
+import { supabase } from './lib/supabase'
+import { syncNotes } from './lib/sync'
+import type { User } from '@supabase/supabase-js'
 
 type SortOption = 'time' | 'title'
 
@@ -16,9 +20,12 @@ function App() {
     createNote,
     updateNote,
     deleteNote,
-    toggleFavorite
+    toggleFavorite,
+    setNotes
   } = useNotes()
 
+  const [user, setUser] = useState<User | null>(null)
+  const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [sortBy, setSortBy] = useState<SortOption>(() => {
     const saved = localStorage.getItem('noteflow_sort')
@@ -29,6 +36,46 @@ function App() {
     return (saved as 'favorite' | 'all') || 'all'
   })
   const searchInputRef = useRef<HTMLInputElement>(null)
+
+  // 检查用户登录状态
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null)
+      setLoading(false)
+    })
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null)
+    })
+
+    return () => subscription.unsubscribe()
+  }, [])
+
+  // 用户登录后同步数据
+  useEffect(() => {
+    if (user) {
+      syncNotes(notes, user.id).then(syncedNotes => {
+        setNotes(syncedNotes)
+      }).catch(error => {
+        console.error('同步失败:', error)
+      })
+    }
+  }, [user])
+
+  // 定时同步（每30秒）
+  useEffect(() => {
+    if (!user) return
+
+    const interval = setInterval(() => {
+      syncNotes(notes, user.id).then(syncedNotes => {
+        setNotes(syncedNotes)
+      }).catch(error => {
+        console.error('自动同步失败:', error)
+      })
+    }, 30000)
+
+    return () => clearInterval(interval)
+  }, [user, notes])
 
   useEffect(() => {
     localStorage.setItem('noteflow_sort', sortBy)
@@ -138,6 +185,22 @@ function App() {
     }
 
     event.target.value = ''
+  }
+
+  const handleAuthSuccess = () => {
+    setLoading(false)
+  }
+
+  if (loading) {
+    return (
+      <div className="app">
+        <div className="loading-state">加载中...</div>
+      </div>
+    )
+  }
+
+  if (!user) {
+    return <Auth onAuthSuccess={handleAuthSuccess} />
   }
 
   return (
