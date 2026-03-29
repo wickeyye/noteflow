@@ -26,6 +26,7 @@ function App() {
 
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
+  const [guestMode, setGuestMode] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [sortBy, setSortBy] = useState<SortOption>(() => {
     const saved = localStorage.getItem('noteflow_sort')
@@ -188,6 +189,7 @@ function App() {
   }
 
   const handleAuthSuccess = () => {
+    setGuestMode(true)
     setLoading(false)
   }
 
@@ -199,7 +201,7 @@ function App() {
     )
   }
 
-  if (!user) {
+  if (!user && !guestMode) {
     return <Auth onAuthSuccess={handleAuthSuccess} />
   }
 
