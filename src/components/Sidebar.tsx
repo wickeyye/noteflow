@@ -1,6 +1,7 @@
 import type { Note, CollapsedSections } from '../types/index'
 import { CollapsibleSection } from './CollapsibleSection'
 import { CompactNoteItem } from './CompactNoteItem'
+import { exportAllNotesAsZip } from '../utils/export'
 
 type SortOption = 'time' | 'title'
 
@@ -11,7 +12,7 @@ interface SidebarProps {
   selectedTag: string | null
   sortBy: SortOption
   collapsedSections: CollapsedSections
-  searchInputRef?: React.RefObject<HTMLInputElement>
+  searchInputRef?: React.RefObject<HTMLInputElement | null>
   onSearchChange: (query: string) => void
   onTagSelect: (tag: string | null) => void
   onSortChange: (sortBy: SortOption) => void
@@ -26,12 +27,10 @@ export function Sidebar({
   notes,
   selectedNote,
   searchQuery,
-  selectedTag,
   sortBy,
   collapsedSections,
   searchInputRef,
   onSearchChange,
-  onTagSelect,
   onSortChange,
   onNoteSelect,
   onNoteCreate,
@@ -39,21 +38,6 @@ export function Sidebar({
   onToggleFavorite,
   onToggleSection
 }: SidebarProps) {
-  // 筛选最近笔记（7天内）
-  const getRecentNotes = () => {
-    const sevenDaysAgo = new Date()
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
-    const sevenDaysAgoStr = sevenDaysAgo.toISOString().split('T')[0]
-
-    return notes
-      .filter(note => note.updatedAt >= sevenDaysAgoStr)
-      .filter(note =>
-        note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        note.content.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-      .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
-  }
-
   // 筛选收藏笔记
   const getFavoriteNotes = () => {
     return notes
@@ -102,6 +86,14 @@ export function Sidebar({
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
           />
+          <button
+            className="btn-export-all"
+            onClick={() => exportAllNotesAsZip(notes)}
+            disabled={notes.length === 0}
+            title="导出所有笔记"
+          >
+            导出全部
+          </button>
         </div>
       </div>
 

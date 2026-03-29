@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { Note } from '../types/index'
+import { exportNoteAsMarkdown } from '../utils/export'
 
 interface EditorProps {
   note: Note | null
@@ -7,9 +8,10 @@ interface EditorProps {
   onTitleChange: (title: string) => void
   onContentChange: (content: string) => void
   onTagsChange: (tags: string[]) => void
+  onImport: (event: React.ChangeEvent<HTMLInputElement>) => void
 }
 
-export function Editor({ note, notesCount, onTitleChange, onContentChange, onTagsChange }: EditorProps) {
+export function Editor({ note, notesCount, onTitleChange, onContentChange, onImport }: EditorProps) {
   const [fontSize, setFontSize] = useState(17)
   const [textColor, setTextColor] = useState('#f5f5f5')
 
@@ -60,6 +62,23 @@ export function Editor({ note, notesCount, onTitleChange, onContentChange, onTag
                 title="选择文字颜色"
               />
             </div>
+            <div className="toolbar-divider"></div>
+            <button
+              className="toolbar-btn"
+              onClick={() => exportNoteAsMarkdown(note)}
+              title="导出当前笔记"
+            >
+              导出 ▼
+            </button>
+            <label className="toolbar-btn" title="导入笔记">
+              导入
+              <input
+                type="file"
+                accept=".md,.zip"
+                onChange={onImport}
+                style={{ display: 'none' }}
+              />
+            </label>
           </div>
           <span className="note-date-compact">📅 {note.updatedAt}</span>
         </div>

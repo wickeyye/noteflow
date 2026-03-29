@@ -4,6 +4,7 @@ import { useNotes } from './hooks/useNotes'
 import { useKeyboard } from './hooks/useKeyboard'
 import { Sidebar } from './components/Sidebar'
 import { Editor } from './components/Editor'
+import { importMarkdownFile, importZipFile, validateFileType } from './utils/import'
 import type { CollapsedSections } from './types/index'
 
 type SortOption = 'time' | 'title'
@@ -91,6 +92,62 @@ function App() {
     }))
   }
 
+  const handleImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files
+    if (!files || files.length === 0) return
+
+    const file = files[0]
+
+    if (!validateFileType(file)) {
+      alert('仅支持 .md 和 .zip 文件')
+      event.target.value = ''
+      return
+    }
+
+    try {
+      if (file.name.endsWith('.zip')) {
+        const importedNotes = await importZipFile(file)
+        if (importedNotes.length === 0) {
+          alert('ZIP 中没有找到 Markdown 文件')
+          return
+        }
+
+        let firstNoteId: number | null = null
+        importedNotes.forEach((noteData, index) => {
+          const newNote = createNote()
+          if (index === 0) firstNoteId = newNote.id
+          updateNote(newNote.id, {
+            title: noteData.title,
+            content: noteData.content,
+            tags: noteData.tags
+          })
+        })
+
+        if (firstNoteId) {
+          const firstNote = notes.find(n => n.id === firstNoteId)
+          if (firstNote) setSelectedNote(firstNote)
+        }
+
+        alert(`成功导入 ${importedNotes.length} 条笔记`)
+      } else if (file.name.endsWith('.md')) {
+        const noteData = await importMarkdownFile(file)
+        const newNote = createNote()
+        updateNote(newNote.id, {
+          title: noteData.title,
+          content: noteData.content,
+          tags: noteData.tags
+        })
+        setSelectedNote(newNote)
+        alert(`已导入笔记：${noteData.title}`)
+      }
+    } catch (error) {
+      console.error('Import failed:', error)
+      alert('导入失败，请检查文件格式')
+    }
+
+    event.target.value = ''
+  }
+
   return (
     <div className="app">
       <Sidebar
@@ -116,6 +173,7 @@ function App() {
         onTitleChange={handleTitleChange}
         onContentChange={handleContentChange}
         onTagsChange={handleTagsChange}
+        onImport={handleImport}
       />
     </div>
   )

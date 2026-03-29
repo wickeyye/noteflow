@@ -38,7 +38,7 @@ export function useNotes() {
     saveNotes(notes)
   }, [notes])
 
-  const createNote = () => {
+  const createNote = (): Note => {
     const newNote: Note = {
       id: Date.now(),
       title: '新建笔记',
@@ -49,6 +49,7 @@ export function useNotes() {
     }
     setNotes([newNote, ...notes])
     setSelectedNote(newNote)
+    return newNote
   }
 
   const updateNote = (noteId: number, updates: Partial<Note>) => {
