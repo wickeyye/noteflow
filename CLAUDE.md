@@ -4,10 +4,10 @@
 
 NoteFlow 是一个简洁高效的笔记应用，采用深色主题设计。
 
-- **当前版本**: v1.0.0-beta (第五阶段进行中)
+- **当前版本**: v1.0.0-beta (云端同步已启用)
 - **技术栈**: React 19 + TypeScript 5.9 + Vite 8
 - **包管理器**: npm
-- **数据存储**: LocalStorage (未来计划云端同步)
+- **数据存储**: LocalStorage (按用户隔离) + Supabase (云端同步已启用)
 
 ## 核心架构
 
@@ -53,9 +53,11 @@ interface Note {
 ### 云端同步
 - ✅ Supabase 用户认证 (登录/注册)
 - ✅ 访客模式 (离线使用)
-- ✅ 云端数据同步 (自动同步)
-- ✅ 多设备数据同步
-- ✅ 冲突解决 (基于时间戳)
+- ✅ LocalStorage 按用户隔离 (每个账户独立存储空间)
+- ✅ 云端数据同步 (已启用，30秒自动同步)
+- ✅ 冲突解决策略 (Last Write Wins)
+- ✅ 初始同步 (登录时自动同步)
+- ✅ 定时同步 (每30秒自动同步)
 
 ### 用户体验
 - ✅ 快捷键支持:
@@ -101,9 +103,46 @@ interface Note {
 - 自定义 Hook (useNotes) 管理笔记状态
 - LocalStorage 同步持久化
 
+## 当前问题和待修复事项
+
+### 🚧 Supabase 云端同步问题（优先级：P0）
+
+**问题描述**：
+- Supabase RLS (Row Level Security) 策略配置不正确
+- 导致笔记无法同步到云端（"new row violates row-level security policy" 错误）
+
+**已完成的工作**：
+- ✅ 实现 LocalStorage 按用户隔离（`noteflow_notes_<userId>`）
+- ✅ 实现 Last Write Wins 同步策略
+- ✅ 修复多账户笔记混淆问题
+- ✅ 创建 `fix-rls-final.sql` 脚本
+- ✅ 重新启用云端同步代码（`App.tsx` 第56-80行）
+- ✅ 创建测试工具 `test-cloud-sync.html`
+- ✅ 创建测试计划 `docs/SYNC_TEST_PLAN.md`
+
+**下一步修复步骤**：
+1. 在 Supabase Dashboard 执行 `fix-rls-final.sql` 脚本
+   - 确保 `user_id` 字段类型为 `uuid`（不是 `text`）
+   - 创建正确的 RLS 策略（`auth.uid() = user_id`，无需类型转换）
+2. 验证 RLS 策略是否正确创建
+3. 使用 `test-cloud-sync.html` 测试 CRUD 操作
+4. 测试完整流程：
+   - 登录 → 创建笔记 → 登出 → 再登录 → 验证笔记是否还在
+   - 检查 Supabase 表中是否有数据
+   - 验证多设备同步是否正常
+
+**相关文件**：
+- `fix-rls-final.sql` - RLS 策略修复脚本
+- `src/App.tsx` - 同步代码（第56-80行已注释）
+- `src/lib/sync.ts` - 同步逻辑实现
+- `src/utils/storage.ts` - LocalStorage 工具函数
+
+---
+
 ## 下一阶段计划 (v1.0.0)
 
 ### 待实现功能
+- [ ] 完成 Supabase 云端同步（当前优先级 P0）
 - [ ] 导出为 PDF
 - [ ] 笔记分类/文件夹
 - [ ] 实时协作 (WebSocket)
@@ -135,9 +174,11 @@ npm run build
 5. 更新样式 (App.css)
 
 ### 数据持久化
-- 所有笔记数据存储在 LocalStorage
+- 所有笔记数据存储在 LocalStorage（按用户隔离）
+- 存储键格式：`noteflow_notes_<userId>` 或 `noteflow_notes_guest`（访客模式）
 - 使用 `storage.ts` 工具函数进行读写
 - 每次修改自动保存
+- 云端同步暂时禁用（见下方"当前问题"）
 
 ## 重要约束
 

@@ -13,6 +13,11 @@ import type { User } from '@supabase/supabase-js'
 type SortOption = 'time' | 'title'
 
 function App() {
+  const [user, setUser] = useState<User | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [guestMode, setGuestMode] = useState(false)
+  const hasSyncedRef = useRef(false) // 标记是否已完成首次同步
+
   const {
     notes,
     selectedNote,
@@ -22,11 +27,7 @@ function App() {
     deleteNote,
     toggleFavorite,
     setNotes
-  } = useNotes()
-
-  const [user, setUser] = useState<User | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [guestMode, setGuestMode] = useState(false)
+  } = useNotes(user?.id) // 传递 userId 给 useNotes
   const [searchQuery, setSearchQuery] = useState('')
   const [sortBy, setSortBy] = useState<SortOption>(() => {
     const saved = localStorage.getItem('noteflow_sort')
@@ -54,9 +55,11 @@ function App() {
 
   // 用户登录后同步数据
   useEffect(() => {
-    if (user) {
+    if (user && !hasSyncedRef.current) {
+      hasSyncedRef.current = true
       syncNotes(notes, user.id).then(syncedNotes => {
         setNotes(syncedNotes)
+        console.log('✅ 初始同步完成')
       }).catch(error => {
         console.error('同步失败:', error)
       })
@@ -70,6 +73,7 @@ function App() {
     const interval = setInterval(() => {
       syncNotes(notes, user.id).then(syncedNotes => {
         setNotes(syncedNotes)
+        console.log('🔄 自动同步完成')
       }).catch(error => {
         console.error('自动同步失败:', error)
       })

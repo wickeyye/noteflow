@@ -10,10 +10,12 @@ export function parseMarkdownFile(
 ): Omit<Note, 'id' | 'updatedAt'> {
   const title = fileName.replace(/\.md$/i, '').trim() || '未命名笔记'
   return {
+    cloudId: crypto.randomUUID(),
     title,
     content,
     tags: [],
-    isFavorite: false
+    isFavorite: false,
+    localUpdatedAt: Date.now()
   }
 }
 

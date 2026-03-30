@@ -49,11 +49,13 @@ export async function testSync() {
     console.log('4️⃣ 测试上传功能...')
     const testNote: Note = {
       id: Date.now(),
+      cloudId: crypto.randomUUID(),
       title: `测试笔记 ${new Date().toLocaleString()}`,
       content: '这是一条测试笔记，用于验证 Supabase 同步功能。',
       tags: ['测试'],
       isFavorite: false,
-      updatedAt: new Date().toISOString().split('T')[0]
+      updatedAt: new Date().toISOString().split('T')[0],
+      localUpdatedAt: Date.now()
     }
 
     await uploadNotes([testNote], user.id)
@@ -80,11 +82,13 @@ export async function testSync() {
     const localNotes: Note[] = [
       {
         id: Date.now() + 1,
+        cloudId: crypto.randomUUID(),
         title: '本地笔记 1',
         content: '这是本地笔记内容',
         tags: ['本地'],
         isFavorite: false,
-        updatedAt: new Date().toISOString().split('T')[0]
+        updatedAt: new Date().toISOString().split('T')[0],
+        localUpdatedAt: Date.now()
       }
     ]
 

@@ -1,8 +1,9 @@
 import { supabase } from './supabase'
 import type { Note } from '../types'
+import { getDeletedCloudIds, clearDeletedCloudIds } from '../utils/storage'
 
 export interface CloudNote {
-  id: string
+  id: string              // 云端 UUID（对应 Note.cloudId）
   user_id: string
   title: string
   content: string
@@ -10,19 +11,22 @@ export interface CloudNote {
   tags: string[]
   created_at: string
   updated_at: string
+  local_updated_at: string // 毫秒时间戳（字符串格式）
 }
 
 /**
  * 将本地笔记转换为云端格式
  */
-function localToCloud(note: Note, userId: string): Omit<CloudNote, 'id' | 'created_at'> {
+function localToCloud(note: Note, userId: string): Omit<CloudNote, 'created_at'> {
   return {
+    id: note.cloudId || crypto.randomUUID(), // 使用 cloudId 作为云端 ID
     user_id: userId,
     title: note.title,
     content: note.content,
     is_favorite: note.isFavorite || false,
     tags: note.tags || [],
-    updated_at: new Date(note.updatedAt).toISOString()
+    updated_at: new Date(note.updatedAt).toISOString(),
+    local_updated_at: String(note.localUpdatedAt || Date.now())
   }
 }
 
@@ -31,43 +35,66 @@ function localToCloud(note: Note, userId: string): Omit<CloudNote, 'id' | 'creat
  */
 function cloudToLocal(cloudNote: CloudNote): Note {
   return {
-    id: parseInt(cloudNote.id.replace(/-/g, '').substring(0, 13), 16),
+    id: parseInt(cloudNote.id.replace(/-/g, '').substring(0, 13), 16), // 从 UUID 生成本地 ID
+    cloudId: cloudNote.id, // 保存云端 UUID
     title: cloudNote.title,
     content: cloudNote.content,
     isFavorite: cloudNote.is_favorite,
     tags: cloudNote.tags || [],
-    updatedAt: new Date(cloudNote.updated_at).toISOString().split('T')[0]
+    updatedAt: new Date(cloudNote.updated_at).toISOString().split('T')[0],
+    localUpdatedAt: parseInt(cloudNote.local_updated_at) || Date.now()
   }
 }
 
 /**
- * 上传本地笔记到云端
+ * 上传本地笔记到云端（使用 upsert 避免主键冲突）
  */
 export async function uploadNotes(notes: Note[], userId: string): Promise<void> {
-  if (!userId || notes.length === 0) return
+  if (!userId) return
 
-  // 先删除用户的所有笔记，然后重新插入
-  // 这样可以避免 upsert 的唯一约束问题
-  const { error: deleteError } = await supabase
-    .from('notes')
-    .delete()
-    .eq('user_id', userId)
+  // 如果没有笔记，删除用户的所有笔记
+  if (notes.length === 0) {
+    const { error: deleteError } = await supabase
+      .from('notes')
+      .delete()
+      .eq('user_id', userId)
 
-  if (deleteError) {
-    console.error('清理旧笔记失败:', deleteError)
-    throw deleteError
+    if (deleteError) {
+      console.error('清理笔记失败:', deleteError)
+      throw deleteError
+    }
+    return
   }
 
-  // 插入所有笔记
+  // 使用 upsert 插入或更新笔记（避免主键冲突）
   const cloudNotes = notes.map(note => localToCloud(note, userId))
 
-  const { error: insertError } = await supabase
+  const { error: upsertError } = await supabase
     .from('notes')
-    .insert(cloudNotes)
+    .upsert(cloudNotes, {
+      onConflict: 'id', // 主键冲突时更新
+      ignoreDuplicates: false // 不忽略重复，而是更新
+    })
 
-  if (insertError) {
-    console.error('上传笔记失败:', insertError)
-    throw insertError
+  if (upsertError) {
+    console.error('上传笔记失败:', upsertError)
+    throw upsertError
+  }
+
+  // 删除云端多余的笔记（本地已删除的）
+  const localCloudIds = notes.map(note => note.cloudId).filter(Boolean)
+
+  if (localCloudIds.length > 0) {
+    const { error: deleteError } = await supabase
+      .from('notes')
+      .delete()
+      .eq('user_id', userId)
+      .not('id', 'in', `(${localCloudIds.join(',')})`)
+
+    if (deleteError) {
+      console.error('清理多余笔记失败:', deleteError)
+      // 不抛出错误，因为主要操作已完成
+    }
   }
 }
 
@@ -92,41 +119,67 @@ export async function downloadNotes(userId: string): Promise<Note[]> {
 }
 
 /**
- * 同步笔记（合并本地和云端）
+ * 同步笔记（方案 A：Last Write Wins + 删除记录）
  */
 export async function syncNotes(localNotes: Note[], userId: string): Promise<Note[]> {
   if (!userId) return localNotes
 
   try {
-    // 下载云端笔记
+    // 1. 下载云端笔记
     const cloudNotes = await downloadNotes(userId)
 
-    // 创建笔记映射（按标题）
-    const cloudMap = new Map(cloudNotes.map(note => [note.title, note]))
-    const localMap = new Map(localNotes.map(note => [note.title, note]))
+    // 2. 获取删除记录（按用户隔离）
+    const deletedCloudIds = getDeletedCloudIds(userId)
 
-    // 合并笔记（保留最新的）
+    // 3. 为没有 cloudId 的本地笔记生成 cloudId
+    const localNotesWithCloudId = localNotes.map(note => ({
+      ...note,
+      cloudId: note.cloudId || crypto.randomUUID(),
+      localUpdatedAt: note.localUpdatedAt || Date.now()
+    }))
+
+    // 4. 建立映射关系（按 cloudId）
+    const cloudMap = new Map(cloudNotes.map(note => [note.cloudId!, note]))
+    const localMap = new Map(localNotesWithCloudId.map(note => [note.cloudId!, note]))
+
+    // 5. 合并笔记
     const mergedNotes: Note[] = []
-    const allTitles = new Set([...cloudMap.keys(), ...localMap.keys()])
+    const allCloudIds = new Set([...cloudMap.keys(), ...localMap.keys()])
 
-    allTitles.forEach(title => {
-      const cloudNote = cloudMap.get(title)
-      const localNote = localMap.get(title)
+    allCloudIds.forEach(cloudId => {
+      const cloudNote = cloudMap.get(cloudId)
+      const localNote = localMap.get(cloudId)
 
       if (cloudNote && localNote) {
-        // 两边都有，保留最新的
-        const cloudTime = new Date(cloudNote.updatedAt).getTime()
-        const localTime = new Date(localNote.updatedAt).getTime()
-        mergedNotes.push(cloudTime > localTime ? cloudNote : localNote)
-      } else if (cloudNote) {
-        mergedNotes.push(cloudNote)
-      } else if (localNote) {
+        // 两边都有，比较 localUpdatedAt，保留最新的
+        const cloudTime = cloudNote.localUpdatedAt
+        const localTime = localNote.localUpdatedAt
+
+        if (localTime > cloudTime) {
+          mergedNotes.push(localNote)
+        } else {
+          mergedNotes.push(cloudNote)
+        }
+      } else if (cloudNote && !localNote) {
+        // 只有云端有，本地没有
+        if (deletedCloudIds.includes(cloudId)) {
+          // 本地已删除，不加入合并结果（云端也会被删除）
+          console.log(`笔记 ${cloudId} 已在本地删除，将从云端删除`)
+        } else {
+          // 云端新笔记，下载到本地
+          mergedNotes.push(cloudNote)
+        }
+      } else if (localNote && !cloudNote) {
+        // 只有本地有，上传到云端
         mergedNotes.push(localNote)
       }
     })
 
-    // 上传本地新增或更新的笔记
+    // 6. 上传合并后的笔记到云端
     await uploadNotes(mergedNotes, userId)
+
+    // 7. 同步成功后清空删除记录（按用户隔离）
+    clearDeletedCloudIds(userId)
 
     return mergedNotes
   } catch (error) {
